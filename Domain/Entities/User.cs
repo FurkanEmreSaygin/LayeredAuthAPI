@@ -1,5 +1,6 @@
 
 using System.ComponentModel.DataAnnotations;
+using Domain.Enums;
 
 namespace Domain.Entities
 {
@@ -14,5 +15,7 @@ namespace Domain.Entities
         [Required, MaxLength(15), MinLength(7)]
         public string PasswordHash { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+
+        public UserRole Role { get; set; } = UserRole.User;
     }
 }
