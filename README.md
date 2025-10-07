@@ -1,66 +1,88 @@
-# 🚀 FoundationAuth - Strict N-Layer .NET Auth API
+That's an excellent request! Creating a comprehensive README.md file is the perfect way to document and finalize our project. This file will serve as the instruction manual, explaining the architecture, setup, and key features to anyone (including your future self) who uses the project.
 
-This project serves as a highly structured and scalable starting point for building robust user management functionality (Registration, Login). It strictly adheres to **Traditional N-Layer Architecture** principles, ensuring clear separation of concerns and maintainability.
+Here is the professional README.md content, summarizing everything we have built and fixed.
 
-## ✨ Key Features & Technologies
+FoundationAuth API (.NET 9)
+This project provides a robust, foundational User Authentication and Authorization API built using a modern Layered Architecture (N-Tier) approach in ASP.NET Core.
 
-* **Architecture:** Strict N-Layer (API -> Business -> DataAccess -> Domain)
-* **Approach:** **Code First** Development with Entity Framework Core
-* **Platform:** .NET Core Web API
-* **Database:** Entity Framework Core (EF Core) and MSSQL
-* **Security:** Strong Password Hashing using **BCrypt.Net-Next**
-* **Authentication:** **JWT (JSON Web Token)** for secure session management
-* **Data Handling:** **DTOs** (Data Transfer Objects) are isolated within the Business layer.
+It is designed to be a secure, reusable core for any larger application requiring authenticated user management.
 
-## 📁 Project Structure and Dependencies
+🚀 Key Features
+Architecture: Strict separation across 4 Layers (Domain, DataAccess, Business, API) ensuring maintainability.
 
-This architecture follows a strict, one-way dependency flow:
+Authentication: Industry-standard JWT (JSON Web Token) for secure session management.
 
-| Project | Layer | Responsibility | Key Principle |
-| :--- | :--- | :--- | :--- |
-| **Api** | Presentation | Handles HTTP requests and configures services. | **Depends ONLY on Business.** |
-| **Business** | Business Logic | Contains core logic: hashing, JWT creation, and DTO handling. | **Depends ONLY on DataAccess.** |
-| **DataAccess** | Data Access | Manages data persistence (EF Core Context, Migrations). | **Depends ONLY on Domain.** |
-| **Domain** | Domain Model | Contains core entities (e.g., `User`). | **Has NO Dependencies.** |
+Security: Password hashing implemented with BCrypt, ensuring highly secure storage.
 
-## 🛠️ Setup and Installation
+Authorization: Role-Based Access Control (RBAC) for granular endpoint protection (Admin, User roles).
 
-1.  **Prerequisites:** .NET SDK (6.0 or higher), SQL Server (or LocalDB), Git.
-2.  **Clone the Repository:**
-    ```bash
-    git clone [REPO_URL]
-    cd FoundationAuth
-    ```
-3.  **Restore Dependencies:**
-    ```bash
-    dotnet restore
-    ```
-4.  **Database Configuration:**
-    * Set your MSSQL **Connection String** in `Api/appsettings.json`.
-    * **Run Initial Migration** (Migrations will be created in the DataAccess project):
-        ```bash
-        # (Once migrations are created)
-        dotnet ef database update --project DataAccess
-        ```
-5.  **Run the API:**
-    ```bash
-    dotnet run --project Api
-    ```
+Data Management: EF Core Code First approach with support for MSSQL (LocalDB).
 
----
+Data Integrity: AutoMapper for safe, decoupled data transfer between layers (Entity to DTO).
 
-## Git Commit'i
+Configuration Security: Sensitive keys and connection strings are managed securely outside the source code using User Secrets.
 
-Bu güncellemeyi Git geçmişimize ekleyelim.
+🏗️ Architecture Layers
+Layer	Responsibility	Dependencies
+Api (Presentation)	Handles HTTP requests, configures infrastructure (DI, JWT, Swagger).	Business
+Business (Service)	Implements core business logic (Register, Login, Token Generation). Uses DTOs.	DataAccess, Domain
+DataAccess (Data)	Manages database operations (CRUD) and Entity Framework Core context.	Domain
+Domain (Core)	Defines core entities (User) and enums.	None
 
-### Terminal Komutları (Git)
+E-Tablolar'a aktar
+🛠️ Setup and Installation
+This project requires the .NET SDK (targeting .NET 9) and a running instance of SQL Server LocalDB to function.
 
-```bash
-# README'yi stage et
-git add README.md
+Step 1: Install Dependencies
+From the project root directory (where the Solution file is located), restore all NuGet packages:
 
-# Commit
-git commit -m "docs: Update README to reflect strict N-Layer architecture
+Bash
 
-- Clarified the strict one-way dependency flow (API -> Business -> DataAccess -> Domain).
-- Updated the Project Structure table to detail dependency rules."
+dotnet restore
+Step 2: Configure Secure Secrets
+We use User Secrets to prevent sensitive values like the JWT secret key and database passwords from being committed to Git.
+
+Navigate to the Api project directory and run the following commands:
+
+Bash
+
+# 1. Initialize the User Secrets feature
+dotnet user-secrets init
+
+# 2. Set the JWT Secret Key (MUST match the key configured in appsettings.json)
+dotnet user-secrets set "JwtSettings:SecretKey" "This-should-be-a-very-long-and-secret-key-at-least-16-characters-long"
+Step 3: Create the Database (Migration)
+The database schema needs to be applied to your LocalDB instance. Run the following commands from the project root:
+
+Bash
+
+# 1. Create Migration files (if not already done)
+dotnet ef migrations add FinalSetup --project DataAccess --startup-project Api
+
+# 2. Apply the schema and create the database in LocalDB
+dotnet ef database update --project DataAccess --startup-project Api
+Note on Connection Errors: If you encounter a connection error, verify that the Server= value in your appsettings.json is correct for your local SQL Server/LocalDB instance (e.g., (localdb)\MSSQLLocalDB).
+
+Step 4: Start the API
+Start the application. The Swagger UI should open automatically in your browser.
+
+Bash
+
+dotnet run --project Api
+🔑 API Endpoints
+Use the Swagger UI interface to test the full functionality of the API.
+
+Method	Endpoint	Description	Requires Authorization
+POST	/api/Auth/register	Creates a new user account. (Default Role: User)	None
+POST	/api/Auth/login	Authenticates a user and returns a JWT Token.	None
+GET	/api/Auth/profile	Retrieves the authenticated user's profile information.	JWT Token
+PUT	/api/Auth/profile	Allows the user to update their username, email, or password.	JWT Token
+GET	/api/Auth/admin-test	Restricted endpoint only accessible by users with the Admin role.	JWT Token + Role Check
+
+E-Tablolar'a aktar
+Testing Authorization
+Login and copy the resulting JWT Token.
+
+Click the Authorize button in Swagger and paste the token in the format: Bearer [your_token].
+
+Attempt to call /api/Auth/admin-test. It should return a 403 Forbidden status for a standard registered user, confirming the role-based security is functional.
