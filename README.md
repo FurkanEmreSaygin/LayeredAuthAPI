@@ -142,3 +142,4 @@ This project is open-source and available under the [MIT License](LICENSE).
 ---
 
 **Developed with ❤️ using ASP.NET Core**
+**Furkan Emre SAYGIN**
