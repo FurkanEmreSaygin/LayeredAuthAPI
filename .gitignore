@@ -1,0 +1,39 @@
+# Genellikle Visual Studio tarafından oluşturulan/kullanılan dosyalar
+*.suo
+*.user
+*.pdb
+*.dll
+*.exe
+
+# Derleme ve Çalışma Zamanı Çıktıları
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+[Tt]emp/
+**/*.nupkg
+
+# Entity Framework Core Otomatik Dosyaları
+ef-logs.txt
+
+# NuGet Paketleri ve Önbellek
+.nuget/
+packages/
+
+# IDE Ayarları
+.vs/
+*.vsp
+*.log
+
+# -----------------
+# HASSAS AYARLAR ve GİZLİ VERİLER
+# -----------------
+
+# HASSAS BİLGİLER: appsettings.Development.json dosyasını GİZELEYİN. 
+# Tüm SecretKey, bağlantı dizesi şifresi vb. bu dosyada tutulmalıdır.
+appsettings.Development.json
+
+# .NET Kullanıcı Gizemleri (User Secrets) dosyası (Kullanıcı makinesinde tutulan gizli ayarlar)
+**/.secrets
+
+# Genel olarak Git tarafından takip edilmemesi gereken her şey
