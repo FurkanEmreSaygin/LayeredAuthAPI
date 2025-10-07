@@ -16,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 // SERVİS KAYITLARI (Dependency Injection)
 // ==========================================================
 
-var connectionString = builder.Configuration.GetConnectionString("MsSqlConnection");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(connectionString);
@@ -25,6 +25,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Katman Bağımlılıkları
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.Configure<Business.Settings.JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));

@@ -60,6 +60,51 @@ namespace Api.Controllers
             return Ok(user);
         }
 
+
+        [HttpPut("update")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfile([FromBody] UserUpdateDto updateDto)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return Unauthorized(new { Message = "Token does not contain a valid user ID." });
+            }
+
+            try
+            {
+                var updatedUser = await _userService.UpdateUserAsync(userId, updateDto);
+                return Ok(updatedUser);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+
+        [HttpDelete("delete")]
+        [Authorize]
+        public async Task<IActionResult> DeleteProfile()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return Unauthorized(new { Message = "Token does not contain a valid user ID." });
+            }
+
+            try
+            {
+                await _userService.DeleteUserAsync(userId);
+                return Ok(new { Message = "User deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+
         [HttpGet("admin-test")]
         [Authorize(Roles = "Admin")] 
         public IActionResult AdminTest()
