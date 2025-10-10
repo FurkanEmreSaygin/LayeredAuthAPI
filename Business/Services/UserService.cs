@@ -18,9 +18,11 @@ namespace Business.Services
         private readonly IAuthRepository _authRepository;
         private readonly IMapper _mapper;
         private readonly JwtSettings _jwtSettings;
+        private readonly IEmailService _emailService;
 
-        public UserService(IAuthRepository authRepository, IMapper mapper, IOptions<JwtSettings> jwtSettings)
+        public UserService(IAuthRepository authRepository, IMapper mapper, IOptions<JwtSettings> jwtSettings, IEmailService emailService)
         {
+            _emailService = emailService;
             _authRepository = authRepository;
             _mapper = mapper;
             _jwtSettings = jwtSettings.Value;
@@ -108,7 +110,8 @@ namespace Business.Services
             {
                 userToUpdate.PasswordHash = BCrypt.Net.BCrypt.HashPassword(UserUpdateDto.NewPassword);
             }
-
+            
+            userToUpdate.UpdatedDate = UserUpdateDto.UpdatedDate ?? DateTime.UtcNow;
             await _authRepository.UpdateUserAsync(userToUpdate);
 
             return _mapper.Map<UserResponseDto>(userToUpdate);

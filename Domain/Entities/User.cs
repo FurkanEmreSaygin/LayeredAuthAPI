@@ -15,7 +15,12 @@ namespace Domain.Entities
         [Required]
         public string PasswordHash { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
-
+        public DateTime? UpdatedDate { get; set; }
         public UserRole Role { get; set; } = UserRole.User;
+
+        // Mail verifaication properties
+        public bool IsEmailVerified { get; set; } = false;
+        public string? VerificationToken { get; set; }
+        public DateTime? TokenExpiryDate { get; set; }
     }
 }
