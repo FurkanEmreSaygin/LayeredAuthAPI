@@ -41,7 +41,7 @@ namespace Api.Controllers
             }
             catch (Exception)
             {
-                return Unauthorized(new { Message = "Invalid credentials." });
+                return Unauthorized(new { Message = "Invalid email or password, or email not verified." });
             }
         }
 
@@ -97,6 +97,29 @@ namespace Api.Controllers
             {
                 await _userService.DeleteUserAsync(userId);
                 return Ok(new { Message = "User deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+        [HttpGet("verify")]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> VerifyEmail([FromQuery] string token)
+        {
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is required.");
+            }
+
+            try
+            {
+                await _userService.VerifyEmailAsync(token);
+
+                return Ok("Email successfully verified. You can now log in.");
             }
             catch (Exception ex)
             {

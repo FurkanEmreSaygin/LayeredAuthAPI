@@ -42,6 +42,11 @@ namespace DataAccess.Repositories
             return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         }
 
+        public async Task<User?> GetUserByVerificationTokenAsync(string token)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.VerificationToken == token);
+        }
+
         public async Task UpdateUserAsync(User user)
         {
             _context.Users.Update(user);

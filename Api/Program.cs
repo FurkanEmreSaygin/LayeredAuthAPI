@@ -9,6 +9,7 @@ using System.Text;
 using Microsoft.OpenApi.Models;
 using DataAccess.Interfaces;
 using Business.Interfaces;
+using Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +26,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Katman Bağımlılıkları
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.Configure<Business.Settings.JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
+
+// Email Servisi Bağımlılıkları
+builder.Services.Configure<Business.Settings.EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -38,7 +46,6 @@ builder.Services.AddControllers();
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var key = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"]!);
-
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -109,7 +116,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 // JWT Kimlik Doğrulama Middleware'ini ekle
 app.UseAuthentication();

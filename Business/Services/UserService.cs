@@ -48,6 +48,19 @@ namespace Business.Services
             {
                 throw new Exception("Invalid email or password.");
             }
+            if (!user.IsEmailVerified)
+            {
+                user.VerificationToken = Guid.NewGuid().ToString();
+                user.TokenExpiryDate = DateTime.UtcNow.AddHours(24);
+
+                await _authRepository.UpdateUserAsync(user);
+
+                string apiBaseUrl = "http://localhost:5212"; 
+                string verificationLink = $"{apiBaseUrl}/api/Auth/verify?token={user.VerificationToken}";
+
+                _ = _emailService.SendVerificationEmailAsync(user, verificationLink);
+                throw new Exception("Email is not verified. A new verification email has been sent to your address. Please check your inbox.");
+            }
 
             string token = GenerateJwtToken(user);
 
@@ -61,13 +74,21 @@ namespace Business.Services
             {
                 throw new Exception("Email address is already registered.");
             }
-
-            string passwordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
-
+            if (await _authRepository.GetUserByUsernameAsync(registerDto.Username) != null)
+            {
+                throw new Exception("Username is already taken.");
+            }
+            
             User newUser = _mapper.Map<User>(registerDto);
-            newUser.PasswordHash = passwordHash;
+            newUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
+
+            newUser.VerificationToken = Guid.NewGuid().ToString();
+            newUser.TokenExpiryDate = DateTime.UtcNow.AddHours(24);
 
             User createdUser = await _authRepository.AddUserAsync(newUser);
+            string apiBaseUrl = "http://localhost:5212";
+            string verificationLink = $"{apiBaseUrl}/api/Auth/verify?token={createdUser.VerificationToken}";
+            await _emailService.SendVerificationEmailAsync(createdUser, verificationLink);
 
             return _mapper.Map<UserResponseDto>(createdUser);
         }
@@ -110,11 +131,37 @@ namespace Business.Services
             {
                 userToUpdate.PasswordHash = BCrypt.Net.BCrypt.HashPassword(UserUpdateDto.NewPassword);
             }
-            
+
             userToUpdate.UpdatedDate = UserUpdateDto.UpdatedDate ?? DateTime.UtcNow;
             await _authRepository.UpdateUserAsync(userToUpdate);
 
             return _mapper.Map<UserResponseDto>(userToUpdate);
+        }
+    
+        public async Task VerifyEmailAsync(string token)
+        {
+            User? user = await _authRepository.GetUserByVerificationTokenAsync(token);
+
+            if (user == null)
+            {
+                throw new Exception("Invalid verification token.");
+            }
+
+            if (user.IsEmailVerified)
+            {
+                throw new Exception("Email is already verified.");
+            }
+
+            if (user.TokenExpiryDate < DateTime.UtcNow)
+            {
+                throw new Exception("Verification token has expired.");
+            }
+
+            user.IsEmailVerified = true;
+            user.VerificationToken = null;
+            user.TokenExpiryDate = null;
+
+            await _authRepository.UpdateUserAsync(user);
         }
         private string GenerateJwtToken(User user)
         {

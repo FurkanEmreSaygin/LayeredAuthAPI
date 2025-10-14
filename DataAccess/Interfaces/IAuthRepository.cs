@@ -9,6 +9,7 @@ namespace DataAccess.Interfaces
         Task<User?> GetUserByIdAsync(int id);
         Task<User?> GetUserByUsernameAsync(string username);
         Task<User?> GetUserByEmailAsync(string email);
+        Task<User?> GetUserByVerificationTokenAsync(string token);
         Task UpdateUserAsync(User user);
         Task DeleteUserAsync(User user);
     }

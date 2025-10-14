@@ -8,6 +8,7 @@ namespace Business.Interfaces
         Task<UserResponseDto> RegisterUserAsync(UserRegisterDto registerDto);
         Task<string> LoginUserAsync(UserLoginDto loginDto);
         Task<UserResponseDto> GetUserByIdAsync(int id);
+        Task VerifyEmailAsync(string token);
 
         //User Crud Operations
         Task DeleteUserAsync(int id);
