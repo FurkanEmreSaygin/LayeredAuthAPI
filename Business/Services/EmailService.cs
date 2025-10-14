@@ -1,17 +1,14 @@
-using Business.Services;
-using Business.Settings; // Yeni ayarlar modelini kullanmak için
+using Business.Settings;
 using Domain.Entities;
 using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Mail;
 
-namespace Api.Services
+namespace Business.Services
 {
     public class EmailService : IEmailService
     {
         private readonly EmailSettings _emailSettings;
-
-        // Constructor: Ayarları IOptionsPattern ile alıyoruz.
         public EmailService(IOptions<EmailSettings> emailSettings)
         {
             _emailSettings = emailSettings.Value;
